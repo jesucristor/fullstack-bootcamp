@@ -1,58 +1,66 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom'
 
-const Header = ({ course }) => (
-  <h1>{course}</h1>
-)
 
-const Part = ({ part }) => {
-  const { name, exercise } = part
+const Button = ({ text, name, func }) => {
   return (
-    <p>{name} {exercise}</p>
-  )
-}
-const Content = ({ parts }) => {
-  const [one, two, three] = parts
-  return (
-    <div>
-      <Part part={one} />
-      <Part part={two} />
-      <Part part={three} />
-
-    </div>
-  )
-}
-const Total = ({ parts }) => {
-  console.log(parts)
-  return (
-    <p> Number of exercises {parts.length} </p>
+    <button onClick={() => func(name + 1)}>{text}</button>
   )
 }
 
+const Statistic = ({ text, value }) => {
+  return (
+    <td>{text} {value}</td>
+  )
+}
 
-const App = () => {
-  const course = {
-    course: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercise: 10
-      },
-      {
-        name: 'Using props to pass data',
-        exercise: 7
-      },
-      {
-        name: 'State of a component',
-        exercise: 14
-      }
-    ]
+const Statistics = ({ feedbacks }) => {
+  const { good, neutral, bad, all } = feedbacks
+  const calculateAverage = (good, bad, all) => {
+    return (((good * 1) + (bad * -1)) / all).toFixed(1)
   }
   return (
     <div>
-      <Header course={course.course} />
-      <Content parts={course.parts} />
-      <Total parts={course.parts} />
+      <table>
+        <tbody>
+          <tr>
+            <Statistic text='good' value={good} />
+          </tr>
+          <tr>
+            <Statistic text='neutral' value={neutral} />
+          </tr>
+          <tr>
+            <Statistic text='bad' value={bad} />
+          </tr>
+          <tr>
+            <Statistic text='average' value={calculateAverage(good, bad, all)} />
+          </tr>
+          <tr>
+            <Statistic text='positive' value={((good * 100) / all).toFixed(1) + ' %'} />
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  )
+
+}
+
+const App = () => {
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+  let all = good + neutral + bad
+
+  return (
+    <div>
+      <h2>Give Feedback</h2>
+      <Button text='good' name={good} func={setGood} />
+      <Button text='neutral' name={neutral} func={setNeutral} />
+      <Button text='bad' name={bad} func={setBad} />
+      <h2>Statistics</h2>
+      {
+        all ? <Statistics feedbacks={{ good, bad, neutral, all }} /> : <p>No feedback given</p>
+      }
     </div>
   )
 }
